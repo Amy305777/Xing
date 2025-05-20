@@ -1,8 +1,10 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 
-TELEGRAM_TOKEN = "你可以先填 test"
-TELEGRAM_CHAT_ID = "你可以先填 123456"
+# 从 GitHub Secrets 读取环境变量
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 def fetch_latest_weibo():
     url = "https://weibo.cn/5780100022"
@@ -11,10 +13,10 @@ def fetch_latest_weibo():
     r.encoding = "utf-8"
     soup = BeautifulSoup(r.text, "html.parser")
     first = soup.find("div", class_="c")
-    if not first: return
-    text = first.find("span", class_="ctt").text
-    link = "https://weibo.com/u/5780100022"
-    return text.strip(), link
+    if not first: return None
+    text = first.find("span", class_="ctt")
+    if not text: return None
+    return text.text.strip(), "https://weibo.com/u/5780100022"
 
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
